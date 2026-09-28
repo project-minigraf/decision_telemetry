@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ['17', '21', '25']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+          cache: maven
+      - name: Build and test
+        run: mvn -B -ntp verify
+      - name: Run the demo (writes .graph runs through minigraf-jvm and diffs them)
+        run: mvn -B -ntp -q -pl trail-demo exec:java
+      - name: CLI reads the demo runs
+        run: |
+          CP="trail-runtime/target/classes:$(mvn -B -ntp -q -pl trail-demo dependency:build-classpath -Dmdep.outputFile=/dev/stdout)"
+          java -cp "$CP" io.github.adityamukho.trail.cli.TrailCli runs trail-demo/target/decision-trail-demo
+          java -cp "$CP" io.github.adityamukho.trail.cli.TrailCli runs trail-demo/target/decision-trail-demo --json
