@@ -13,11 +13,6 @@
   <description>Java proof of concept for decision telemetry: record which branches code took and why, store runs in Minigraf, diff them.</description>
   <url>https://github.com/project-minigraf/decision_telemetry</url>
 
-  <licenses>
-    <license><name>MIT</name><url>https://opensource.org/licenses/MIT</url></license>
-    <license><name>Apache-2.0</name><url>https://www.apache.org/licenses/LICENSE-2.0</url></license>
-  </licenses>
-
   <modules>
     <module>trail-runtime</module>
     <module>trail-javac</module>
