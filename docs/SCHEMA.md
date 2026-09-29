@@ -1,6 +1,6 @@
-# decision-trail schema, version 1
+# decision-telemetry schema, version 1
 
-This is the contract between instrumenters (today: the Java plugin) and readers (the CLI, a future MCP server, a future IDE plugin, anything else). It does not depend on Java. An instrumenter for Python, TypeScript or Rust can write the same files, and every reader will work on them.
+This is the contract between instrumenters (today: the Java proof of concept) and readers (the CLI, a future MCP server, a future IDE plugin, anything else). It does not depend on Java. An instrumenter for any language with Minigraf bindings can write the same files, and every reader will work on them.
 
 Change it only with a version bump. The version is stored in every run as `:run/schema` (Minigraf) or `"schema"` (JSON).
 

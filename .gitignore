@@ -1,7 +1,7 @@
 target/
 *.class
-decision-trail/
-decision-trail-demo/
+decision-telemetry/
+decision-telemetry-demo/
 .idea/
 *.iml
 .vscode/

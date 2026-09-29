@@ -6,8 +6,11 @@ on:
   pull_request:
 
 jobs:
-  build:
+  java:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: java
     strategy:
       fail-fast: false
       matrix:
@@ -19,6 +22,7 @@ jobs:
           distribution: temurin
           java-version: ${{ matrix.java }}
           cache: maven
+          cache-dependency-path: java/**/pom.xml
       - name: Build and test
         run: mvn -B -ntp verify
       - name: Run the demo (writes .graph runs through minigraf-jvm and diffs them)
@@ -26,5 +30,5 @@ jobs:
       - name: CLI reads the demo runs
         run: |
           CP="trail-runtime/target/classes:$(mvn -B -ntp -q -pl trail-demo dependency:build-classpath -Dmdep.outputFile=/dev/stdout)"
-          java -cp "$CP" io.github.adityamukho.trail.cli.TrailCli runs trail-demo/target/decision-trail-demo
-          java -cp "$CP" io.github.adityamukho.trail.cli.TrailCli runs trail-demo/target/decision-trail-demo --json
+          java -cp "$CP" io.github.adityamukho.trail.cli.TrailCli runs trail-demo/target/decision-telemetry-demo
+          java -cp "$CP" io.github.adityamukho.trail.cli.TrailCli runs trail-demo/target/decision-telemetry-demo --json

@@ -1,14 +1,16 @@
-# decision-trail
+# decision-telemetry
 
-Decision telemetry for Java. It records which way your code went at each `if`, ternary and `switch`, and the values that drove each choice. It stores each run in a [Minigraf](https://github.com/project-minigraf/minigraf) file. Then it compares two runs and tells you where they parted ways, and why.
+Decision telemetry records which way your code went at each `if`, ternary and `switch`, and the values that drove each choice. It stores each run in a [Minigraf](https://github.com/project-minigraf/minigraf) file. Then it compares two runs and tells you where they parted ways, and why.
+
+It is not tied to one language. Runs follow a language-neutral [schema](docs/SCHEMA.md), and the plan is to support every language that has Minigraf bindings. The Java code in [`java/`](java/) is a proof of concept.
 
 It is built for code that nobody on the team knows well, such as large amounts of AI-generated code. An SRE should not need to read the code to find the decision that went wrong.
 
-> Status: early spike (0.1.0-SNAPSHOT). The API and file format may change.
+> Status: early spike (0.1.0-SNAPSHOT). Only the Java proof of concept exists so far. The API and file format may change.
 
 ## What it looks like
 
-The demo runs the same checkout twice. The only difference is how fast a background loyalty lookup is. The totals differ, and nothing fails:
+The Java demo runs the same checkout twice. The only difference is how fast a background loyalty lookup is. The totals differ, and nothing fails:
 
 ```
 fast loyalty: total 12150 (discount 1350)
@@ -22,8 +24,8 @@ First divergence: ternary ...Services$CustomerCache#tierOf(String)/ternary#1 wen
   call path:
     io.github.adityamukho.trail.demo.Checkout#handle(Order,int)
     io.github.adityamukho.trail.demo.Services$CustomerCache#tierOf(String)
-  baseline:  #10 ternary#1 (t != null) -> true {t=GOLD}  @trail-demo/src/main/java/.../Services.java:26
-  candidate: #9 ternary#1 (t != null) -> false {t=null}  @trail-demo/src/main/java/.../Services.java:26
+  baseline:  #10 ternary#1 (t != null) -> true {t=GOLD}  @java/trail-demo/src/main/java/.../Services.java:26
+  candidate: #9 ternary#1 (t != null) -> false {t=null}  @java/trail-demo/src/main/java/.../Services.java:26
   changed t: GOLD -> null
 
 Input changes before it (possible causes):
@@ -35,7 +37,7 @@ Input changes before it (possible causes):
 
 The cache lookup found nothing in the slow run, so the customer lost the gold discount. The loyalty latency is the likely cause. The loyalty work ran on a pool thread, and the trail followed it there.
 
-## How to use it
+## Using the Java proof of concept
 
 ### 1. Turn on the compiler plugin
 
@@ -67,7 +69,7 @@ Maven:
       </path>
     </annotationProcessorPaths>
     <compilerArgs>
-      <arg>-Xplugin:DecisionTrail</arg>
+      <arg>-Xplugin:DecisionTelemetry</arg>
     </compilerArgs>
   </configuration>
 </plugin>
@@ -81,7 +83,7 @@ dependencies {
     runtimeOnly("io.github.adityamukho:minigraf-jvm:1.2.0")
     annotationProcessor("io.github.adityamukho:trail-javac:0.1.0-SNAPSHOT")
 }
-tasks.withType<JavaCompile> { options.compilerArgs.add("-Xplugin:DecisionTrail") }
+tasks.withType<JavaCompile> { options.compilerArgs.add("-Xplugin:DecisionTelemetry") }
 ```
 
 ### 2. Choose what to trace
@@ -106,7 +108,7 @@ boolean login(String user, @Redact String password) { ... }   // the value never
 Or trace code you do not want to touch. This traces every method that makes a decision in these packages:
 
 ```
--Xplugin:DecisionTrail packages=com.acme.billing,com.acme.pricing
+-Xplugin:DecisionTelemetry packages=com.acme.billing,com.acme.pricing
 ```
 
 Other plugin options: `ternary=false` and `verbose`.
@@ -136,7 +138,7 @@ Kept runs are written by one background thread, one file per run.
 | `trail.autoRun` | `true` | start a run at the outermost traced method if no `@DecisionRun` is active |
 | `trail.sample` | `0.0` | share of healthy runs to keep |
 | `trail.sink` | `auto` | `auto`, `minigraf`, `jsonl`, `both`, `none`. `auto` uses Minigraf if it is on the classpath |
-| `trail.dir` | `./decision-trail` | where run files go |
+| `trail.dir` | `./decision-telemetry` | where run files go |
 | `trail.maxNodes` | `20000` | nodes kept per run |
 | `trail.maxValueChars` | `200` | longest string value |
 | `trail.toStringPackages` | none | package prefixes whose objects may be shown with `toString()` |
@@ -161,7 +163,7 @@ java -cp trail-runtime.jar:minigraf-jvm.jar io.github.adityamukho.trail.cli.Trai
 
 Every command accepts `--json`. The JSON shapes are fixed and documented, so scripts and AI agents can use the same commands people use. `diff` exits with 1 when the runs diverged, so it also works in CI.
 
-## How it works
+## How the Java instrumenter works
 
 The plugin runs inside `javac`, right after parsing. It rewrites traced methods like this:
 
@@ -212,7 +214,7 @@ The format is a language-neutral contract, so other instrumenters and readers ca
 
 ## Overhead
 
-Measured on one machine with a small method (one frame and two decisions per call). These are early numbers, not tuned yet:
+Measured for the Java proof of concept on one machine with a small method (one frame and two decisions per call). These are early numbers, not tuned yet:
 
 | Case | Cost per call |
 |---|---|
@@ -222,7 +224,7 @@ Measured on one machine with a small method (one frame and two decisions per cal
 
 Every run is recorded in full and the keep decision is made at the end, so failures are always captured. That also means every traced request pays the recording cost. Keep tracing to the code you are investigating, or turn it off with `trail.enabled=false`.
 
-## Limits
+## Limits of the Java proof of concept
 
 - Name capture works from syntax, before types are known. It skips names that look like types (`Tier.GOLD`, `UUID.randomUUID()`). A lower-case class name used as a receiver would be taken for a variable and fail to compile. Rename it, or trace that method by hand.
 - Ternaries with numeric literals, primitive casts, lambdas or method references as operands are not traced, since routing them through a generic call could change their type.
@@ -232,16 +234,19 @@ Every run is recorded in full and the keep decision is made at the end, so failu
 
 ## Building
 
+The Java proof of concept lives in `java/`:
+
 ```
+cd java
 mvn verify                       # build and test all modules
-mvn -pl trail-demo exec:java     # run the demo; runs go to trail-demo/target/decision-trail-demo
+mvn -pl trail-demo exec:java     # run the demo; runs go to trail-demo/target/decision-telemetry-demo
 ```
 
 ## What's next
 
 - An MCP server over the same queries (`runs`, `show`, `diff`, `why`, `query`), so incident-response agents can use trails with no glue code.
 - An IntelliJ plugin that reads the schema and shows decision outcomes next to the code, for any language that writes the format.
-- Instrumenters for other languages that write the same schema.
+- Instrumenters for the other languages that have Minigraf bindings, all writing the same schema.
 - Lower overhead: a ring buffer per run and lazy value rendering.
 
 ## License
