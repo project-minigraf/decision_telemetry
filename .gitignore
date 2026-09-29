@@ -1,2 +1,11 @@
+target/
+*.class
+decision-trail/
+decision-trail-demo/
+.idea/
+*.iml
+.vscode/
+
+# Local memory graph
 memory.graph
 memory.graph.fts.sqlite3
