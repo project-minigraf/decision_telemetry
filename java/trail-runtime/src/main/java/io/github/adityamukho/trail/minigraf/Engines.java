@@ -7,12 +7,12 @@ import java.lang.reflect.Modifier;
 /**
  * Opens Minigraf databases.
  *
- * <p>By default this uses {@code io.github.adityamukho:minigraf-jvm} through reflection. Set the
+ * <p>By default this uses {@code io.github.project-minigraf:minigraf-jvm} through reflection. Set the
  * system property {@code trail.minigraf.engineFactory} to a class with a public static
  * {@code DatalogEngine open(String path)} method to use something else, such as a test double.
  */
 public final class Engines {
-    static final String MINIGRAF_CLASS = "io.github.adityamukho.minigraf.MiniGrafDb";
+    static final String MINIGRAF_CLASS = "uniffi.minigraf_ffi.MiniGrafDb";
     private static final String FACTORY_PROPERTY = "trail.minigraf.engineFactory";
 
     private Engines() {
@@ -81,7 +81,7 @@ public final class Engines {
                 return new Reflective(db);
             } catch (ClassNotFoundException e) {
                 throw new IllegalStateException(
-                        "minigraf-jvm is not on the classpath. Add io.github.adityamukho:minigraf-jvm, "
+                        "minigraf-jvm is not on the classpath. Add io.github.project-minigraf:minigraf-jvm, "
                                 + "or set trail.sink=jsonl.", e);
             } catch (InvocationTargetException e) {
                 throw unwrap(e);

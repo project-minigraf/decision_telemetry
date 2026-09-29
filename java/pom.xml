@@ -30,7 +30,7 @@
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
     <junit.version>5.11.4</junit.version>
-    <minigraf.version>1.2.0</minigraf.version>
+    <minigraf.version>2.0.2</minigraf.version>
   </properties>
 
   <dependencyManagement>
@@ -41,7 +41,7 @@
         <version>${junit.version}</version>
       </dependency>
       <dependency>
-        <groupId>io.github.adityamukho</groupId>
+        <groupId>io.github.project-minigraf</groupId>
         <artifactId>minigraf-jvm</artifactId>
         <version>${minigraf.version}</version>
       </dependency>

@@ -23,8 +23,8 @@ jobs:
           java-version: ${{ matrix.java }}
           cache: maven
           cache-dependency-path: java/**/pom.xml
-      - name: Build and test
-        run: mvn -B -ntp verify
+      - name: Build, test and install (the demo steps resolve modules from the local repo)
+        run: mvn -B -ntp install
       - name: Run the demo (writes .graph runs through minigraf-jvm and diffs them)
         run: mvn -B -ntp -q -pl trail-demo exec:java
       - name: CLI reads the demo runs

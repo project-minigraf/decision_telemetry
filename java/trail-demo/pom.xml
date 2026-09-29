@@ -24,7 +24,7 @@
       <artifactId>trail-runtime</artifactId>
     </dependency>
     <dependency>
-      <groupId>io.github.adityamukho</groupId>
+      <groupId>io.github.project-minigraf</groupId>
       <artifactId>minigraf-jvm</artifactId>
       <scope>runtime</scope>
     </dependency>

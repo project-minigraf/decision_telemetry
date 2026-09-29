@@ -25,7 +25,7 @@
     </dependency>
     <!-- Only for tests: the runtime reaches Minigraf through reflection, so users add it themselves. -->
     <dependency>
-      <groupId>io.github.adityamukho</groupId>
+      <groupId>io.github.project-minigraf</groupId>
       <artifactId>minigraf-jvm</artifactId>
       <scope>test</scope>
     </dependency>

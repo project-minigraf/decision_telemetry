@@ -66,13 +66,6 @@ public class Torture {
         return y;
     }
 
-    double area(Shape sh) {
-        return switch (sh) {
-            case Circle c -> Math.PI * c.r() * c.r();
-            case Square q -> q.s() * q.s();
-        };
-    }
-
     String tier(Tier t, int total, @Redact String email) {
         discount: if (t == Tier.GOLD && total > 100 && !email.isEmpty()) {
             return "big";
@@ -173,7 +166,7 @@ public class Torture {
         Torture t = new Torture();
         StringBuilder b = new StringBuilder();
         b.append(t.patterns("hello")).append(t.patterns(3)).append(t.definite(7)).append(t.definite(-1));
-        b.append(t.area(new Circle(1))).append(t.area(new Square(2))).append(new Circle(2).size());
+        b.append(new Circle(2).size());
         b.append(t.tier(Tier.GOLD, 150, "a@b.c")).append(t.tier(Tier.SILVER, 7, "x"));
         b.append(t.lambdas(new ArrayList<>(List.of(1, 2, 3))));
         b.append(t.max("pear", "apple")).append(t.varargs("a", "b")).append(t.varargs());

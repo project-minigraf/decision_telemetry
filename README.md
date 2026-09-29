@@ -51,9 +51,9 @@ Maven:
 </dependency>
 <!-- optional: store runs in Minigraf instead of JSON Lines -->
 <dependency>
-  <groupId>io.github.adityamukho</groupId>
+  <groupId>io.github.project-minigraf</groupId>
   <artifactId>minigraf-jvm</artifactId>
-  <version>1.2.0</version>
+  <version>2.0.2</version>
   <scope>runtime</scope>
 </dependency>
 
@@ -80,7 +80,7 @@ Gradle:
 ```kotlin
 dependencies {
     implementation("io.github.adityamukho:trail-runtime:0.1.0-SNAPSHOT")
-    runtimeOnly("io.github.adityamukho:minigraf-jvm:1.2.0")
+    runtimeOnly("io.github.project-minigraf:minigraf-jvm:2.0.2")
     annotationProcessor("io.github.adityamukho:trail-javac:0.1.0-SNAPSHOT")
 }
 tasks.withType<JavaCompile> { options.compilerArgs.add("-Xplugin:DecisionTelemetry") }
@@ -238,7 +238,7 @@ The Java proof of concept lives in `java/`:
 
 ```
 cd java
-mvn verify                       # build and test all modules
+mvn install                      # build, test and install all modules (the demo needs them installed)
 mvn -pl trail-demo exec:java     # run the demo; runs go to trail-demo/target/decision-telemetry-demo
 ```
 

@@ -8,6 +8,8 @@ import io.github.adityamukho.trail.TrailConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
@@ -83,9 +85,6 @@ class PluginTest {
         assertEquals("true", discount.outcome());
         assertEquals("<redacted>", discount.inputs().get(2).value());
 
-        Node sw = find(r, "demo.Torture#area(Shape)/switch#1", null);
-        assertEquals("sh", sw.text());
-
         Node objectsIf = find(r, "demo.Torture#tier(Tier,int,String)/if#2", null);
         assertEquals(List.of("email", "total"), names(objectsIf));
 
@@ -107,6 +106,19 @@ class PluginTest {
             assertTrue(!n.site().contains("$1#run"), "anonymous classes must not be traced: " + n.site());
         }
         assertEquals("ok", r.status());
+    }
+
+    @Test
+    @EnabledForJreRange(min = JRE.JAVA_21)
+    void switchPatternsAreTraced() throws Exception {
+        String plain = runCase("demo.SwitchPatterns", false);
+        runs.clear();
+        String traced = runCase("demo.SwitchPatterns", true);
+        assertEquals(plain, traced);
+        Decisions.flush(Duration.ofSeconds(10));
+        RunRecord r = runs.get(runs.size() - 1);
+        Node sw = find(r, "demo.SwitchPatterns#area(Shape)/switch#1", null);
+        assertEquals("sh", sw.text());
     }
 
     @Test
