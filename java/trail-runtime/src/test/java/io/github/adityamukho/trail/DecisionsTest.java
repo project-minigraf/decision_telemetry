@@ -157,7 +157,7 @@ class DecisionsTest {
         } finally {
             pool.shutdown();
         }
-        List<RunRecord> runs = sink.drain();
+        List<RunRecord> runs = drainAfterAsyncRelease();
         assertEquals(1, runs.size());
         RunRecord r = runs.get(0);
         Node root = r.roots().get(0);
@@ -190,12 +190,7 @@ class DecisionsTest {
         } finally {
             pool.shutdown();
         }
-        // The task releases the run just after its future completes, so give it a moment.
-        List<RunRecord> runs = sink.drain();
-        for (int i = 0; i < 50 && runs.isEmpty(); i++) {
-            Thread.sleep(20);
-            runs = sink.drain();
-        }
+        List<RunRecord> runs = drainAfterAsyncRelease();
         assertEquals(1, runs.size());
         assertEquals(4, runs.get(0).nodes().size());
     }
@@ -222,5 +217,15 @@ class DecisionsTest {
         RunRecord r = sink.drain().get(0);
         assertEquals(3, r.nodes().size());
         assertEquals(3, r.dropped());
+    }
+
+    /** A task releases its run just after its future completes, so give the run a moment to end. */
+    private List<RunRecord> drainAfterAsyncRelease() throws InterruptedException {
+        List<RunRecord> runs = sink.drain();
+        for (int i = 0; i < 50 && runs.isEmpty(); i++) {
+            Thread.sleep(20);
+            runs = sink.drain();
+        }
+        return runs;
     }
 }
