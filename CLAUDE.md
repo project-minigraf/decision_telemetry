@@ -26,16 +26,13 @@ Verified in the cloud session with plain `javac` (Maven Central was blocked ther
 
 Verified locally on JDK 17 (2026-09-29): `mvn install` in `java/` passes (the JDK 21 switch-pattern test is skipped there), the demo runs and diffs fast vs slow, and the CLI reads the `.graph` runs. Minigraf comes from `io.github.project-minigraf:minigraf-jvm:2.0.2` (class `uniffi.minigraf_ffi.MiniGrafDb`, opened through `Companion.open`); `MinigrafRoundTripTest` passes against it.
 
-Not verified yet:
-- CI on GitHub (JDK 17, 21, 25).
-- The plugin on JDK 25.
+Verified on GitHub CI (2026-10-19, JDK 17, 21 and 25): `mvn install` with all tests, including the plugin on JDK 25 and the JDK 21+ switch-pattern test; the demo writes `.graph` runs through minigraf-jvm; and the CLI reads them, in text and `--json`.
 
 ## Next steps
 
-1. Get CI green on `project-minigraf/decision_telemetry`.
-2. Dogfood on a real project with `-Xplugin:"DecisionTelemetry packages=<its root package>"`.
-3. MCP server exposing runs, show, diff, why and query.
-4. Lower recording overhead (about 130 ns per recorded event now): ring buffer per run, lazy value rendering.
+1. Dogfood on a real project with `-Xplugin:"DecisionTelemetry packages=<its root package>"`.
+2. MCP server exposing runs, show, diff, why and query.
+3. Lower recording overhead (about 130 ns per recorded event now): ring buffer per run, lazy value rendering.
 
 ## Style
 
