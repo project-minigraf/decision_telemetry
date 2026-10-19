@@ -248,3 +248,16 @@ mvn -pl trail-demo exec:java     # run the demo; runs go to trail-demo/target/de
 - An IntelliJ plugin that reads the schema and shows decision outcomes next to the code, for any language that writes the format.
 - Instrumenters for the other languages that have Minigraf bindings, all writing the same schema.
 - Lower overhead: a ring buffer per run and lazy value rendering.
+
+## License
+
+Licensed under either of:
+
+- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+- MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+
+at your option.
+
+### Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
